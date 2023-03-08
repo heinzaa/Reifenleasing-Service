@@ -1,7 +1,5 @@
 <template>
-
-  <div style="height: 500px; width: 100%">
-    <div style="height: 200px; overflow: auto;">
+    <div style="height: 200px; overflow: hidden;">
       <p>First marker is placed at {{ withPopup.lat }}, {{ withPopup.lng }}</p>
       <p>Center is at {{ currentCenter }} and the zoom is: {{ currentZoom }}</p>
       <button @click="showLongText">
@@ -11,6 +9,7 @@
         Toggle map
       </button>
     </div>
+  <div style="height: 500px; width: 100%">
     <l-map
       v-if="showMap"
       :zoom="zoom"
@@ -52,6 +51,7 @@
 </template>
 
 <script>
+import "leaflet/dist/leaflet.css";
 import { latLng } from "leaflet";
 import { LMap, LTileLayer, LMarker, LPopup, LTooltip } from "@vue-leaflet/vue-leaflet";
 import { ref, onMounted } from 'vue';
@@ -68,7 +68,7 @@ export default {
   },
   data() {
     return {
-      zoom: 13,
+      zoom: 10,
       center: latLng(47.41322, -1.219482),
       url: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
       attribution:

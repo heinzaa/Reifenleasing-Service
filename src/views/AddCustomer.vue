@@ -1,13 +1,15 @@
 <template>
-  <InvoiceForm />
+  <div>
+  <Stepper />
+</div>
 </template>
 
 <script>
-import InvoiceForm from '../components/InvoiceForm.vue'
+import Stepper from '../components/Stepper.vue';
 
 export default {
     components: {
-        InvoiceForm
+        Stepper
     }
 
 }

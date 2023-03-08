@@ -4,6 +4,7 @@ import Dashboard from '../views/Dashboard.vue'
 import NotFound from '../views/NotFound.vue'
 const Registration = () => import('../views/Registration.vue')
 import AddCustomer from '../views/AddCustomer.vue'
+const Map = () => import('../views/MapView.vue')
 
 const routes = [
   {
@@ -24,6 +25,11 @@ const routes = [
     path: '/addCustomer',
     name: 'AddCustomer',
     component: AddCustomer
+  },
+  {
+    path: '/Map',
+    name: 'Map',
+    component: Map
   },
   {
     path: '/:callAll(.*)',

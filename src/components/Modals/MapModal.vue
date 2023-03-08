@@ -3,7 +3,8 @@
     <div v-show="modalActive" class="modal">
       <transition name="model-animation-inner">
         <div v-show="modalActive" class="modal-inner">
-          <slot />
+          <!-- <slot /> -->
+          <Map />
           <button type="button" class="btn btn-primary mt-2 me-2" @click="close">Zum Dashboard</button>
           <button type="button" class="btn btn-outline-secondary mt-2" @click="cancel"> Weiteres Ticket erstellen</button>
         </div>
@@ -13,12 +14,11 @@
 </template>
 
 <script>
-
-
+import Map from "../Map.vue"
 
 export default {
   components:{
-      
+      Map
   },
 
   props: ["modalActive"],

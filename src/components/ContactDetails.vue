@@ -1,84 +1,50 @@
 <template>
  
-  <div id="InvoiceForm"> 
-
-  <div class="testbox">
-    <form @submit.prevent="handleSubmit">
-      <div class="banner">
-        <h1>Rechnung Reifenleasing</h1>
-      </div>
-      <div class="item">
-        <p>Kundendaten</p>
-        <div class="name-item">
-          <input type="text" name="name" placeholder="Vorname" v-model="firstName" />
-          <input type="text" name="name" placeholder="Nachname" v-model="lastName" />
+    <div id="InvoiceForm">   
+    <div class="testbox">
+      <form @submit.prevent="handleSubmit">
+        <div class="banner">
+          <h1>Rechnung Reifenleasing</h1>
         </div>
-      </div>
-      <div class="item">
-        <p>Email</p>
-        <input type="email" name="email" placeholder="E-Mail" v-model="eMail"/>
-      </div>
-      <div class="item">
-        <p>Telefonnummer</p>
-        <input type="text" name="phone" placeholder="### ### ####" v-model="phoneNumber"/>
-      </div>
-      <div class="item">
-        <p>Addresse</p>
-        <input class="input-street" type="text" name="name" placeholder="Straße" v-model="street" required/>
-        <div class="city-item">
-          <input type="text" name="name" placeholder="Stadt" required v-model="city"/>
-          <input type="text" name="name" placeholder="Region" v-model="region" required/>
-          <input type="text" name="name" placeholder="Postleitzahl" v-model="zipCode" required/>
-          <select class="select-country" v-model="country" required>
-            <option selected value="" disabled>Country</option>
-            <option value="1">Italien</option>
-            <option value="2">Deutschland</option>
-            <option value="3">Frankreich</option>
-            <option value="4">USA</option>
-            <option value="5">England</option>
-            <option value="5">Schweiz</option>
-          </select>
+        <div class="item">
+          <p>Kundendaten</p>
+          <div class="name-item">
+            <input type="text" name="name" placeholder="Vorname" v-model="firstName" />
+            <input type="text" name="name" placeholder="Nachname" v-model="lastName" />
+          </div>
         </div>
-      </div>
-      
-      <div class="item">
-          <p>Anzahl Kilometer</p>
-          <input type="number" name="anzahlKilometer" v-model="kilometers" />
-      </div>  
-
-       <div class="item">          
-           <p>Reifeklasse</p>
-           <div class="city-item">
-         <select class="select-country" v-model="tiresClass" required>
-          <option selected value="" disabled>Reifenklasse</option>
-            <option value="Premiumklasse">Premiumklasse</option>
-            <option value="Oberklasse">Oberklasse</option>
-            <option value="Mittelklasse">Mittelklasse</option>
-          </select>
-           </div>
-        </div>    
-
-    <div class="item">
-          <p>Gesamtpreis</p>
-          <input type="number" name="anzahlKilometer" v-model="price" />
-    </div>    
-
-        <div class="btn-block">
-          <button class="btn-add-invoice" type="submit" @click="addInvoice" :disabled="loading"> <span>{{loading ? "Laden..." : "Einreichen"}}</span>
-          </button>
+        <div class="item">
+          <p>Email</p>
+          <input type="email" name="email" placeholder="E-Mail" v-model="eMail"/>
         </div>
-    </form>
-    </div> -->
-
-    <MapModal :modal-active="modalActive" @close="navToDashboard" @cancel="closeModal">
-        <div>
-            <Map />
+        <div class="item">
+          <p>Telefonnummer</p>
+          <input type="text" name="phone" placeholder="### ### ####" v-model="phoneNumber"/>
         </div>
-    </MapModal>  
- </div> 
-</template>
+        <div class="item">
+          <p>Addresse</p>
+          <input class="input-street" type="text" name="name" placeholder="Straße" v-model="street" required/>
+          <div class="city-item">
+            <input type="text" name="name" placeholder="Stadt" required v-model="city"/>
+            <input type="text" name="name" placeholder="Region" v-model="region" required/>
+            <input type="text" name="name" placeholder="Postleitzahl" v-model="zipCode" required/>
+            <select class="select-country" v-model="country" required>
+              <option selected value="" disabled>Country</option>
+              <option value="1">Italien</option>
+              <option value="2">Deutschland</option>
+              <option value="3">Frankreich</option>
+              <option value="4">USA</option>
+              <option value="5">England</option>
+              <option value="5">Schweiz</option>
+            </select>
+          </div>
+        </div>       
+      </form>
 
-<script>
+    </div>
+   </div> 
+  </template>
+  <script>
 import Map from '../components/Map.vue'
 import { useRouter } from "vue-router";
 import { supabase } from '../supabase'
@@ -314,7 +280,6 @@ export default {
 
 }
 </script>
-
 <style scoped>
       html, body {
       min-height: 100%;
