@@ -1,36 +1,41 @@
 <template>
   <transition name="model-animation">
-    <div v-show="modalActive" class="modal">
+    <div v-show="modalActive" class="modal content">
       <transition name="model-animation-inner">
         <div v-show="modalActive" class="modal-inner">
           <!-- <slot /> -->
-          <Map />
-          <button type="button" class="btn btn-primary mt-2 me-2" @click="close">Zum Dashboard</button>
-          <button type="button" class="btn btn-outline-secondary mt-2" @click="cancel"> Weiteres Ticket erstellen</button>
+          <Map ref="mapComponent" />
+          <button type="button" class="btn btn-outline-secondary mt-2" @click="cancel">Schließen</button>
         </div>
       </transition>
     </div>
   </transition>
+
 </template>
 
 <script>
 import Map from "../Map.vue"
-
+import { ref, onMounted } from 'vue';
 export default {
   components:{
       Map
   },
-
   props: ["modalActive"],
   setup(props, {emit}){
 
+    const mapComponent = ref('')
+
+    
     const close = () => {
+      mapComponent.value = mapComponent.value.mapComponent
       emit('close');
     }
     const cancel = () =>{
       emit('cancel');
     }
-    return {close, cancel}
+
+
+    return {close, cancel, mapComponent}
   }
 }
 </script>
@@ -41,17 +46,18 @@ export default {
     display: flex;
     justify-content: center;
     align-items: center;
-    height: 100vh;
-    width: 100vw;
+    height: 1000px;
+    width: 1000px;
     position: fixed;
     top: 0;
     left: 0;
     background-color: rgb(0, 0, 0, 0.6);
+    border: black
 }
 
 .modal-inner {
     position: relative;
-    max-width: 640px;
+    max-width: 1000px;
     background-color: #fff;
     padding: 20px;
     margin: 0.75rem;
@@ -81,6 +87,13 @@ export default {
 }
 .modal-animation-inner-leave-to {
     transform: scale(0.8);
+}
+.content{
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  -webkit-transform: translate(-50%, -50%);
+  transform: translate(-50%, -50%);
 }
 
 </style>

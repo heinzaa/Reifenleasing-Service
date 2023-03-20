@@ -1,6 +1,10 @@
 
 
 <template>
+  <div class="heading mt-5">
+<p class="heading-text">Reifenleasing-Service</p>
+</div>
+
   <div>
       <RegistrationForm />
   </div>
@@ -20,5 +24,14 @@ components: {
 </script>
 
 <style>
+.heading{
+  text-align: center;
+  top: 20px;
+}
+.heading-text{
+    font-size: 3rem;
+    font: bold;
+}
+
 
 </style>

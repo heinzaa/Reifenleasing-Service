@@ -1,20 +1,12 @@
 <template>
-  <div>
+<div class="heading mt-5">
+<p class="heading-text">Reifenleasing-Service</p>
+</div>
+
+<div class="content">
+  
       <LoginForm />
   </div>
-  <form-wizard>
-        <tab-content title="About You" :selected="true">
-            This is content of Tab 1
-        </tab-content>
-        <tab-content title="About your Company"> 
-            <p>Can contains</p>
-            <p>Multiple Elements</p>
-        </tab-content>
-        <tab-content title="Finishing Up">
-            <p>Or an image .. or any thing</p>
-            <img src="../assets/dog.png" alt="Simple" />
-        </tab-content>  
-    </form-wizard>
 </template>
 
 <script>
@@ -28,6 +20,23 @@ components: {
 }
 </script>
 
-<style>
+<style scoped>
+.content {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  -webkit-transform: translate(-50%, -50%);
+  transform: translate(-50%, -50%);
+}
+
+.heading{
+  text-align: center;
+  top: 20px;
+}
+.heading-text{
+    font-size: 3rem;
+    font: bold;
+}
+
 
 </style>

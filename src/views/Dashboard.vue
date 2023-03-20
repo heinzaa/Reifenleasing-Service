@@ -1,7 +1,8 @@
 <template>
-    <div id="Dashboard">
+<div class="heading mt-5">
+<p class="heading-text">Kundenübersicht</p>
+</div>
         <CustomerOverview />
-    </div>
 </template>
 
 <script>
@@ -15,6 +16,15 @@ export default {
 }
 </script>
 
-<style>
+<style scoped>
+.heading{
+  text-align: center;
+  top: 20px;
+}
+.heading-text{
+    font-size: 3rem;
+    font: bold;
+}
+
 
 </style>
