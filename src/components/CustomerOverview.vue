@@ -1,165 +1,184 @@
 <template>
 
-<div class="card-side">  
-<h1 class="title-kunde mt-3">Angebotsübersicht <span class="badge bg-secondary">Anzahl</span></h1>
-<div class="site-container">
-<div class="card-container">
-  <div class="mb-3" v-for="profile in profiles" :key="profile.id">
-    <div class="card">
-      <div class="card-body border-3">
-        <h5 class="card-title">Kunde{{profile.username}} {{profile.lastName}}</h5>
-        <p class="card-text m-0 ">Angelegt am: </p>
-        <p class="card-text m-0 ">Entfernung: </p>
-        <p class="card-text m-0 ">Preis: </p>
-        <p class="card-text mt-0 ">Reifenart: </p>
-      <div class="button-details">
-       <button type="button" class="btn btn-info">Kunde anzeigen</button>      
+
+<NoCustomerExist :modal-active="modalActive" @close="navToDashboard" @cancel="closeModal">
+            <div>
+                 <b-icon-send-check style="font-size:3em; margin:15px; color:green;"></b-icon-send-check> 
+                <h2>Es sind noch keine Kunden vorhanden.</h2>
+                <p>Bitte legen Sie Ihren ersten Kuden an!</p>
+            </div>
+        </NoCustomerExist>
+
+<div class="row row-cols-1 row-cols-md-4 g-4 m-auto justify-content-center">
+  <div class="col" v-for="existingContract in existingContracts" :key="existingContract.id" >
+    <div class="card h-100">
+      <img src="https://mdbcdn.b-cdn.net/img/new/standard/city/041.webp" class="card-img-top"
+        alt="Hollywood Sign on The Hill" />
+      <div class="card-body">
+        <h5 class="card-title">{{existingContract.firstName}} {{existingContract.lastName}}</h5>
+        <p class="card-text m-0 ">Email: {{ existingContract.eMail }} </p>
+        <p class="card-text m-0 ">Entfernung: {{ existingContract.fahrstrecke }} </p>
+        <p class="card-text m-0 ">Preis: {{ existingContract.basispreis }} €</p>
+        <p class="card-text mt-0 ">Reifenart: {{ existingContract.reifenname }}</p>            
       </div>
+      <div class="card-footer">
+        <small class="text-muted">Angelegt am: {{ existingContract.timestap }}</small>
+      </div>
+      <div class="button-details m-3">
+       <button type="button" @click="showCustomer(existingContract.id)" class="btn btn-outline-info btn-rounded">Kunde anzeigen</button>      
       </div>
     </div>
   </div>
 </div>
 
-<div>
-  <button type="button" @click="addCustomer" class="btn btn-info button-add">
-    <span class="button-add-text">Kunde anlegen</span>
-  </button>
+<div v-if="!modalActive" class="u-center-text u-margin-top-huge mt-2">
+  <button type="button" @click="addCustomer" class="btn btn--green">Kunden anlegen</button>
 </div>
 
-</div>
-</div>
+
 </template>
 
 <script>
 import { onMounted, ref, computed } from 'vue';
 import { supabase } from '../supabase'
 import { useRouter } from 'vue-router';
+import NoCustomerExist from './Modals/NoCustomerExist.vue'
 
 
 export default {
-  setup() {
-    
-    const profiles = ref()
-    const router = useRouter();
 
-    const newItem = ref({ name: '', age: '', email: '' });
-      const addItem = () => {
-      items.value.push(newItem.value);
-      newItem.value = { name: '', age: '', email: '' };
-    };
+  components:{
+    NoCustomerExist
+  },
+
+  setup() {
+
+   
+    
+    const router = useRouter();
+    const existingContracts = ref()
+    const loading = ref(false)
+    const modalActive = ref(false)
+    
+
+    onMounted( async ()  => {
+      existingContracts.value =  await fetchUsers()
+      if(existingContracts.value.length == 0){
+        modalActive.value = true;
+      }
+    })
 
     const fetchUsers = async () => {
-      const { data, error } = await supabase
-        .from('profiles').select('*')
-      if (error) {
-        return error;
-      } else {
-        profiles.value = data
-      }
-    } 
+            try{
+            const { data, error } = await supabase
+                .from('rechnungsinformationen')
+                .select()
+
+            if (error){
+                throw error
+            }
+            if (data){
+                return data
+            } 
+            } catch (error){
+                alert(error.message)
+            } finally {
+                loading.value = false
+            } 
+        }
+    
+    const showCustomer = (contractID) => {
+      const id = contractID
+      router.push({ name: "contract", params: { id: id } });
+    }
 
     const addCustomer = () =>{
        router.push('/addCustomer')
     }
 
+    const closeModal = () =>{
+      modalActive.value = false
+    }
 
-    onMounted(fetchUsers);
 
     return {
-      profiles,
-      addItem,
-      newItem,
-      addCustomer
+      addCustomer,
+      fetchUsers, 
+      existingContracts,
+      loading, 
+      showCustomer,
+      modalActive,
+      closeModal
+
     };
   },
 };
 </script>
 <style scoped>
 @import url('https://fonts.googleapis.com/css2?family=PT+Sans:wght@400;700&display=swap');
-.title-kunde{
+
+.headline{
   text-align: center;
 }
-
-.card-side{
-  line-height: 1.5;
-  background: #f0f4fb;
-}
-
-.site-container{
-  margin: 3rem auto;
-  max-width: calc(100% - 80px);
-  background-image: linear-gradient(to right top, #d0e9f4, #b1eaf9, #8bebf8, #5debf0, #12ebe0);}
-
-.card-container{
-  display: flex;
-  justify-content:space-evenly;
-  flex-wrap: wrap;
-  align-items: center;
-}
-
-.card {
-  background: white;
-  border-radius: 20px 20px 20px 20px;
-  transition: 0.3s;
-  width: 250px;
- }
-
- p{
-   font-family: sans-serif;
-   font-size: 100%;
-   font-size: 16px;
-   line-height: 1.5;   
- }
-
-.card:hover{
-  box-shadow: 0 4px 20px 0 rgba(34,68,123,0.2);
-  cursor: pointer;
-}
-
-.card-title{
-  margin: 1rem 0;
-  color: #22447b;
-}
-
-.card-body{
-  display: block;
-}
-
 .button-details{
-  text-align: center;
+  display: flex;
+  justify-content: center;
 }
-
-.icon-add{
-  width: 2rem;
-  height: 1.5em;
+.u-center-text {
+  text-align: center !important;
 }
-
-.button-add{
-  display: inline-flex;
-  height: 50px;
-  padding: 0;
-  border: none;
-  outline: none;
-  overflow: hidden;
+.btn, .btn:link, .btn:visited {
+  text-transform: uppercase;
+  text-decoration: none;
+  padding: 1.5rem 4rem;
+  display: inline-block;
+  border-radius: 0.5rem;
+  -webkit-transition: all 0.2s;
+  transition: all 0.2s;
+  position: relative;
+  font-size: 1rem;
   cursor: pointer;
 }
 
-.button-add-text, .button-add-icon{
-  display: inline-flex;
-  align-items: center;
-  padding: 0 24px;
-  height: 100%;
-  color: aliceblue;
+.btn:hover {
+  -webkit-transform: translateY(-3px);
+          transform: translateY(-3px);
+  -webkit-box-shadow: 0 1rem 2rem rgba(0, 0, 0, 0.2);
+          box-shadow: 0 1rem 2rem rgba(0, 0, 0, 0.2);
+}
+
+.btn:hover::after {
+  -webkit-transform: scaleX(1) scaleY(1.2);
+          transform: scaleX(1) scaleY(1.2);
+  opacity: 0;
+}
+
+.btn:active, .btn:focus {
+  outline: none;
+  -webkit-transform: translateY(-1px);
+          transform: translateY(-1px);
+  -webkit-box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.2);
+          box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.2);
 }
 
 
-button{
-  color: aliceblue;
+.btn--green {
+  background: -webkit-gradient(linear, left top, right top, from(#EA6F25), to(#1F69CA));
+  background: linear-gradient(to right, #EA6F25, #1F69CA);
+  color: #fff;
 }
 
-button:hover{
-  filter: brightness(95%);
-  color: aliceblue;
+.btn--green::after {
+  background-color: #55c57a;
+}
+
+*,
+*::after,
+*::before {
+  margin: 0;
+  padding: 0;
+  -webkit-box-sizing: inherit;
+          box-sizing: inherit;
 }
 
 </style>
