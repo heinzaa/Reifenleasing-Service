@@ -4,7 +4,7 @@
     <div class="testbox">
       <form @submit.prevent="handleSubmit">
         <div class="banner">
-          <h1>Rechnung Reifenleasing</h1>
+          <h1>Kundeninformationen</h1>
         </div>
         <div class="item">
           <p>Kundendaten</p>
@@ -29,71 +29,67 @@
             <input type="text" name="name" placeholder="Region" v-model="region" required/>
             <input type="text" name="name" placeholder="Postleitzahl" v-model="zipCode" required/>
             <select class="select-country" v-model="country" required>
-              <option selected value="" disabled>Country</option>
-              <option value="1">Italien</option>
-              <option value="2">Deutschland</option>
-              <option value="3">Frankreich</option>
-              <option value="4">USA</option>
-              <option value="5">England</option>
-              <option value="5">Schweiz</option>
+              <option selected value="Italien" disabled>Country</option>
+              <option value="Italien">Italien</option>
+              <option value="Deutschland">Deutschland</option>
+              <option value="Frankreich">Frankreich</option>
+              <option value="USA">USA</option>
+              <option value="England">England</option>
+              <option value="Schweiz">Schweiz</option>
             </select>
           </div>
         </div>       
+        <div class="u-center-text u-margin-top-huge mt-2">
+            <button class="btn btn--green" type="button" @click="addInvoice" :disabled="loading || allreadySubmitted"> <span>{{loading ? "Laden..." : "Einreichen"}}</span>
+            </button>
+          </div>
       </form>
+
+      <SubmitModal :modal-active="modalActive" @close="navToDashboard" @cancel="closeModal">
+            <div>
+                <b-icon-send-check style="font-size:3em; margin:15px; color:green;"></b-icon-send-check> 
+                <h2>Kundeninformationen erfolgreich hochgeladen.</h2>
+                <p>Bitte fahren Sie mit den Reiseninformationen fort!</p>
+            </div>
+        </SubmitModal>
+
 
     </div>
    </div> 
   </template>
   <script>
-import Map from '../components/Map.vue'
 import { useRouter } from "vue-router";
 import { supabase } from '../supabase'
-import { reactive, defineComponent, ref } from "vue";
-import MapModal from './Modals/MapModal.vue'
+import { ref } from "vue";
+import SubmitModal from './Modals/SubmitModal.vue'
+
 
 
 export default {
-    components: {
-        MapModal, Map     
+    components: {   
+        SubmitModal
     },
 
     setup(){
     
-
         const router = useRouter()
         const loading = ref(false)
         // Deklaration der Kundendaten
-        const firstName = ref('Marc')
-        const lastName = ref('Heintz')
+        const firstName = ref('')
+        const lastName = ref('')
         const eMail = ref('heintz.marc@web.de')
-        const phoneNumber = ref('12345678')
-        const street = ref('Jägerp')
-        const city = ref('Neupotz')
-        const region = ref('Pfalz')
-        const zipCode = ref('76777')
+        const phoneNumber = ref('+4912345678')
+        const street = ref('Hauptstraße')
+        const city = ref('Ludwigshafen')
+        const region = ref('Rheinland-Pfalz')
+        const zipCode = ref('67059')
         const country = ref('Deutschland')
+        const kundenID = ref(null)
        
 
-        // Travelinformation
-        const kilometers = ref('100');
-        const coordinate_x = ref(300.20);
-        const coordinate_y = ref(400.20);
-        const streetinformation = ref({});
-
-
-        // Rechnungsinformationen
-        const price = ref('100');
-        const kundenID = ref('');
-        const reifenID = ref('');
-        const reiseID = ref('');
-
-        // Reifeninformationen
-        const tiresClass = ref('')
-        const tiresBasicPrice = ref('')
-        const manufacturer = ref('')
-        const tireName = ref('')
-
         const modalActive = ref(false)
+
+        const allreadySubmitted = ref(false)
 
 
         const  addInvoice = async () => {
@@ -107,13 +103,7 @@ export default {
                 return
             }
               
-               await createCustomer(),
-               await getTireInformation(),
-               await createTravelInformation()
-               await createInvoice()
-            
-            const oViewInformation =  getOverviewView()
-            console.log(oViewInformation)
+               await createCustomer()
 
         }
 
@@ -141,111 +131,19 @@ export default {
             }
             } catch (error){
                 alert(error.message)
-            }
-
-        }
-
-        async function getTireInformation () {
-             try{
-            console.log("reifenklasse" + tiresClass.value)
-            const { data, error } = await supabase
-                .from('Reifen')
-                .select()
-                .eq('reifenklasse', tiresClass.value)
-            if (error){
-                throw error;
-            }
-            if (data){
-                reifenID.value = data[0].id
-                return data
-            }           
-            } catch (error){
-                alert(error.message)
-            }
-        }
-
-        async function createTravelInformation () {
-            try{
-
-            const { data, error } = await supabase
-                .from('Reiseinformationen')
-                .insert({ fahrstrecke: kilometers.value,
-                          coordinate_x: coordinate_x.value,
-                          coordinate_y: coordinate_y.value,
-                          straßeninfos: streetinformation.value
-             }).select()
-            if (error){
-                throw error;
-            }
-            if (data){
-                reiseID.value = data[0].id
-                return data
-            }           
-            } catch (error){
-                alert(error.message)
-            }
-        }
-
-        async function getOverviewView (){
-            try{
-            const { data, error } = await supabase
-                .from('rechnungsinformationen')
-                .select()
-
-            if (error){
-                throw error
-            }
-            if (data){
-                return data
-            } 
-            } catch (error){
-                alert(error.message)
-            } finally {
+            } finally{
                 loading.value = false
-            } 
+            }
+            modalActive.value = !modalActive.value
+            allreadySubmitted.value = true
         }
 
-        async function createInvoice() {
-            
-         try{
-            const { data, error } = await supabase
-                .from('Rechnung')
-                .insert({ kundenID: kundenID.value,
-                          reifenID: reifenID.value,
-                          reiseID: reiseID.value,
-                          preis: price.value                         
-                }).select()
-            if (error){
-                throw error
-            } 
-            if (data){
-                return data
-            }
-            } catch(error){
-                alert(error.message)
-            }
-        }
+
+      
 
         const closeModal = () => {
             modalActive.value = false
         }
-
-
-
-            // Zuerst in der Reifen DB manuell in der GUI die Reifenklassen anlegen mit Preis / km und Faktor
-
-            // Einbindung der Map um die Koordinaten zu bekommen
-
-            // Dann die Straßen dazulesen aus der CSV 
-
-            // Preis kalkulieren 
-
-            // dann in die DB shcreiben
-
-            // microsoft flow hört darauf 
-
-            // schickt dann eine E-mail an den Kunden oder eine MS Teams Nachricht
-
 
         return{
             firstName, 
@@ -257,22 +155,13 @@ export default {
             region, 
             zipCode, 
             country, 
-            kilometers, 
-            price,
             loading, 
-            tiresClass, 
-            tiresBasicPrice,    
-            manufacturer,
-            tireName,    
-            addInvoice,
             createCustomer,
-            getTireInformation,
-            getOverviewView,
-            createTravelInformation,
-            createInvoice,
             closeModal,
             modalActive,
-
+            kundenID,
+            addInvoice,
+            allreadySubmitted
         }
 
 
@@ -318,11 +207,16 @@ export default {
       border-radius: 6px;
       background: #27333A; 
       }
+      .u-center-text{
+        display: flex !important;
+        justify-content: center;
+      }
       .banner {
       position: relative;
-      height: 230px;
-      background-image: url("../assets/reisen-bild-reifenleasing.jpg");  
+      height: 300px;
+      background-image: url("../assets/roadtrip.jpeg");  
       background-size: cover;
+      background-attachment: scroll;
       display: flex;
       justify-content: center;
       align-items: center;
@@ -362,23 +256,60 @@ export default {
       position: relative;
       margin: 5px 0;
       }
-      .btn-block {
-      margin-top: 10px;
-      text-align: center;
-      border-radius: 20px; 
-      }
-      button {
-      width: 150px;
-      padding: 10px;
-      border: none;
-      border-radius: 20px; 
-      background: #51AE8B;
-      cursor: pointer;
-      }
-      button:hover {
-      box-shadow: 0 0 18px 0 #3d2914;
-      border-radius: 20px; 
-      }
+      .btn, .btn:link, .btn:visited {
+  text-transform: uppercase;
+  text-decoration: none;
+  padding: 0.5rem;
+  display: inline-block;
+  border-radius: 0.5rem;
+  -webkit-transition: all 0.2s;
+  transition: all 0.2s;
+  position: relative;
+  font-size: 1rem;
+  cursor: pointer;
+  border: none;
+}
+
+.btn:hover {
+  -webkit-transform: translateY(-3px);
+          transform: translateY(-3px);
+  -webkit-box-shadow: 0 1rem 2rem rgba(0, 0, 0, 0.2);
+          box-shadow: 0 1rem 2rem rgba(0, 0, 0, 0.2);
+}
+
+.btn:hover::after {
+  -webkit-transform: scaleX(1) scaleY(1.2);
+          transform: scaleX(1) scaleY(1.2);
+  opacity: 0;
+}
+
+.btn:active, .btn:focus {
+  outline: none;
+  -webkit-transform: translateY(-1px);
+          transform: translateY(-1px);
+  -webkit-box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.2);
+          box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.2);
+}
+
+
+.btn--green {
+  background: -webkit-gradient(linear, left top, right top, from(#EA6F25), to(#1F69CA));
+  background: linear-gradient(to right, #EA6F25, #1F69CA);
+  color: #fff;
+}
+
+.btn--green::after {
+  background-color: #55c57a;
+}
+
+*,
+*::after,
+*::before {
+  margin: 0;
+  padding: 0;
+  -webkit-box-sizing: inherit;
+          box-sizing: inherit;
+}    
       @media (min-width: 568px) {
       .name-item, .city-item {
       display: flex;
@@ -392,7 +323,7 @@ export default {
       .city-item select {
       width: calc(50% - 20px);
       background: white;
-      color: #858585;
+      color: black;
       }
 
       .city-item{
