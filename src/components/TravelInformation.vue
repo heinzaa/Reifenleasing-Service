@@ -3,20 +3,22 @@
 <div class="heading mt-5">
 <p class="heading-text">Reiseinformationen</p>
 </div>
-
+<h3>Bitte wählen Sie die Reisreoute</h3>
 <div>
-<h4>1. Bitte öffnen Sie die Karte und wählen Sie die Fahrstrecke aus</h4>
-<button type="button" class="btn btn-outline-info btn-rounded" @click="showMap">
-        Karte anzeigen
-</button> 
+<Map ref="mapComponent" />
 </div>
 
+
 <div>
-    <form>    
-      <div class="mb-3">
-            <label for="anzahlKilometerInputId" class="form-label">Anzahl Kilometer</label>
-            <input type="number" id="anzahlKilometerInputId" class="form-control" name="anzahlKilometer" required disabled v-model="kilometers" />
-        </div>   
+    <h4>Anzahl Kilometer (in Kilometer)</h4>
+    <form class="row" >    
+      <div class="col">
+            <input type="number" id="anzahlKilometerInputId" class="form-control" name="anzahlKilometer" required disabled v-model="kilometers" />            
+      </div>
+      <div class="col">
+        <button class="btn btn-outline-info btn-rounded" type="button" @click="showKilometers" :disabled="bKilometers"> <span>{{loading ? "Laden..." : "Distanz berechnen"}}</span>
+        </button>
+      </div>
     </form>
 </div>
 <button type="button" class="btn btn-outline-info btn-rounded" @click="enableTireSelection">Weiter</button>
@@ -39,7 +41,6 @@
 </form>
 </div>
     
-          <MapModal ref="mapComponent" :modal-active="modalActive" @close="navToDashboard" @cancel="closeModal"/>
   
           <div v-if="tireSelected" class="btn-block">
             <button class="btn btn-outline-info btn-rounded" type="button" @click="addInvoice" :disabled="loading"> <span>{{loading ? "Laden..." : "Infos hochladen"}}</span>
@@ -53,14 +54,14 @@
 
 <script>
 
-import MapModal from './Modals/MapModal.vue'
+
 import { ref } from 'vue'
 import { supabase } from '../supabase'
-
+import Map from './Map.vue'
 
 export default {
     components: {
-        MapModal      
+     Map      
 
     },
 
@@ -74,7 +75,7 @@ export default {
         const price = ref(null)
         const tiresClass = ref(null)
         const loading = ref(false)
-
+        const bKilometers = ref(false)
         const routeSelected = ref(false)
         const tireSelected = ref(false)
 
@@ -84,9 +85,11 @@ export default {
             }            
         }
 
-        const showMap = () => {
-            modalActive.value = true
+        const showKilometers = () => {
+            kilometers.value = Math.round(mapComponent.value.distance / 1000)
         }
+
+      
 
         const onTireSelected = (event) => {
             if(event.target.value != null){
@@ -103,7 +106,7 @@ export default {
 
         const closeModal = () =>{
             modalActive.value = false
-            kilometers.value = Math.round(mapComponent.value.mapComponent.distance / 1000)
+            kilometers.value = Math.round(mapComponent.value.distance / 1000)
             reiseID.value = mapComponent.value.mapComponent.reiseID
         }
 
@@ -128,7 +131,6 @@ export default {
 
         return {
             modalActive,
-            showMap,
             closeModal,
             kilometers,
             mapComponent,
@@ -141,7 +143,9 @@ export default {
             enableTireSelection,
             routeSelected,
             onTireSelected,
-            tireSelected
+            tireSelected,
+            showKilometers,
+            bKilometers
         }
     }
 
