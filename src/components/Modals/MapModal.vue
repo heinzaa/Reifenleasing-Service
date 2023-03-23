@@ -33,8 +33,7 @@ export default {
     const cancel = () =>{
       emit('cancel');
     }
-
-
+    
     return {close, cancel, mapComponent}
   }
 }
@@ -57,7 +56,7 @@ export default {
 
 .modal-inner {
     position: relative;
-    max-width: 1000px;
+    width: 1200px;
     background-color: #fff;
     padding: 20px;
     margin: 0.75rem;
