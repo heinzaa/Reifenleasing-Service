@@ -59,13 +59,13 @@ components: {
 setup(context){
   const loading = ref(false)
   let zoom = ref(10)
-  let center = latLng(41.42925, 12.5736)
+  let center = ref(latLng(-27.96199, 153.39527))
   let url = 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png'
   let attribution =  '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'  
-  let  withPopup =  latLng(47.41322, -1.219482)
-  let  withTooltip = latLng(47.41422, -1.250482)
+  let  withPopup =  latLng(-27.96199, 153.39527)
+  let  withTooltip = latLng(-27.96199, 153.39527)
   let  currentZoom = ref(11.5)
-  let  currentCenter = ref(latLng(41.42925, 12.5736))
+  let  currentCenter = ref(latLng(-27.96199, 153.39527))
   let  showParagraph = false
   let  markers = ref([])
   let  mapOptions = {
@@ -109,7 +109,7 @@ setup(context){
       mapPointsToInstructions(response)
 
   
-       //await travelInformationToDB();
+       await travelInformationToDB();
 
        loading.value = false 
   }
