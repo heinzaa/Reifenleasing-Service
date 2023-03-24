@@ -76,7 +76,7 @@ export default {
                    .from('Rechnung')
                    .insert({ kundenID: kundenID.value,
                              reifenID: TravelInformationRef.value.reifenID,
-                             reiseID: TravelInformationRef.value.reiseID,                    
+                             reiseID: TravelInformationRef.value.mapComponent.reiseID,                    
                    }).select()
                if (error){
                    throw error
