@@ -40,6 +40,22 @@
           </div>    
 </form>
 </div>
+
+
+
+<div>
+    <h4>Preis berechnen</h4>
+    <form class="row" >    
+      <div class="col">
+            <input type="number" id="preisInputId" class="form-control" name="gesamtPreis" required disabled v-model="gesamtPreis" />            
+      </div>
+      <div class="col">
+        <button class="btn btn-outline-info btn-rounded" type="button" @click="calculatePrice" :disabled="bKilometers"> <span>{{loading ? "Laden..." : "Distanz berechnen"}}</span>
+        </button>
+      </div>
+    </form>
+</div>
+
     
   
           <div v-if="tireSelected" class="btn-block">
@@ -78,6 +94,7 @@ export default {
         const bKilometers = ref(false)
         const routeSelected = ref(false)
         const tireSelected = ref(false)
+        const gesamtPreis = ref()
 
         const enableTireSelection = () =>{
             if(kilometers.value != null){
@@ -101,14 +118,10 @@ export default {
         const addInvoice = () => {
             loading.value = true
             getTireInformation()
+            reiseID.value = mapComponent.value.reiseID
             loading.value = false
         }
 
-        const closeModal = () =>{
-            modalActive.value = false
-            kilometers.value = Math.round(mapComponent.value.distance / 1000)
-            reiseID.value = mapComponent.value.mapComponent.reiseID
-        }
 
         const getTireInformation = async () => {
             try{
@@ -129,9 +142,17 @@ export default {
             }
         }
 
+
+        const calculatePrice = () => {
+
+
+            
+        }
+
+        
+
         return {
             modalActive,
-            closeModal,
             kilometers,
             mapComponent,
             reiseID,
@@ -145,7 +166,8 @@ export default {
             onTireSelected,
             tireSelected,
             showKilometers,
-            bKilometers
+            bKilometers,
+            gesamtPreis
         }
     }
 
