@@ -33,13 +33,13 @@
                 </div>
                 <div>
                     <h2 class="mb-3"><u>Reiseinformationen</u></h2>
-                    <p><strong>Zurückgelegte Streck: </strong>{{ oInvoiceInformation[0].fahrstrecke }} Km</p>
+                    <p><strong>Zurückgelegte Streck: </strong>{{ (oInvoiceInformation[0].fahrstrecke / 1000).toFixed(2) }} Km</p>
                     <p><strong>Roughness Indicator:</strong>  {{ oInvoiceInformation[0].iri }}</p>
                     <p><strong>Reifenklasse: </strong>{{ oInvoiceInformation[0].reifenklasse }}</p>
                     <p><strong>Reifenname: </strong> {{ oInvoiceInformation[0].reifenname }}</p>
                     <p><strong>Hersteller: </strong>{{ oInvoiceInformation[0].hersteller }}</p>
                     <p><strong>Basispreis</strong> {{ oInvoiceInformation[0].basispreis }}</p>
-                    <p><strong>Von</strong> {{oInvoiceInformation[0].startpunkt_adress_infos.city}} - {{oInvoiceInformation[0].startpunkt_adress_infos.road}}</p>
+                    <p><strong>Von</strong> {{oInvoiceInformation[0].startpunkt_adress_infos.city || oInvoiceInformation[0].startpunkt_adress_infos.city_district}} - {{oInvoiceInformation[0].startpunkt_adress_infos.road}}</p>
                     <p><strong>Nach</strong> {{oInvoiceInformation[0].endpunkt_adress_infos.city}} - {{oInvoiceInformation[0].endpunkt_adress_infos.road}}</p>
                 </div>
                 <br />
