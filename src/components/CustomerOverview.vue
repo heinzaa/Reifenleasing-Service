@@ -7,7 +7,7 @@
                 <h2>Es sind noch keine Kunden vorhanden.</h2>
                 <p>Bitte legen Sie Ihren ersten Kuden an!</p>
             </div>
-        </NoCustomerExist>
+</NoCustomerExist>
 
 <div class="row row-cols-1 row-cols-md-4 g-4 m-auto justify-content-center">
   <div class="col" v-for="existingContract in existingContracts" :key="existingContract.id" >
@@ -16,13 +16,15 @@
         alt="Hollywood Sign on The Hill" />
       <div class="card-body">
         <h5 class="card-title">{{existingContract.firstName}} {{existingContract.lastName}}</h5>
-        <p class="card-text m-0 ">Email: {{ existingContract.eMail }} </p>
-        <p class="card-text m-0 ">Entfernung: {{ existingContract.fahrstrecke }} </p>
-        <p class="card-text m-0 ">Preis: {{ existingContract.basispreis }} €</p>
-        <p class="card-text mt-0 ">Reifenart: {{ existingContract.reifenname }}</p>            
+        <p class="card-text m-0 "><strong>ID:</strong> {{ existingContract.id }} </p>
+        <p class="card-text m-0 "><strong>Distanz:</strong> {{ existingContract.fahrstrecke  }} km </p>
+        <p class="card-text m-0 "><strong>Preis:</strong> {{ existingContract.preis }} €</p>
+        <p class="card-text m-0 "><strong>Von:</strong> {{ existingContract.startpunkt_adress_infos.city }} - {{  existingContract.startpunkt_adress_infos.road }} </p>
+        <p class="card-text m-0 "><strong>Nach:</strong> {{existingContract.endpunkt_adress_infos.city}} - {{existingContract.startpunkt_adress_infos.road}} </p>
+        <p class="card-text mt-0"><strong>Reifenklasse</strong> {{ existingContract.reifenklasse }}</p>            
       </div>
       <div class="card-footer">
-        <small class="text-muted">Angelegt am: {{ existingContract.timestap }}</small>
+        <small class="text-muted"><strong>Angelegt am: </strong> {{ existingContract.created_at }}</small>
       </div>
       <div class="button-details m-3">
        <button type="button" @click="showCustomer(existingContract.id)" class="btn btn-outline-info btn-rounded">Kunde anzeigen</button>      
@@ -66,6 +68,13 @@ export default {
       if(existingContracts.value.length == 0){
         modalActive.value = true;
       }
+
+    
+    convertTimestamp()
+    convertDistance()
+      
+
+
     })
 
     const fetchUsers = async () => {
@@ -100,6 +109,24 @@ export default {
       modalActive.value = false
     }
 
+    const convertTimestamp = () => {
+      
+
+      for(let i = 0; i < existingContracts.value.length; i++){
+        let date = new Date(existingContracts.value[i].created_at)
+        existingContracts.value[i].created_at = date.toLocaleDateString()
+
+      }
+
+
+    }
+
+    const convertDistance = () => {
+      for(let i = 0; i < existingContracts.value.length; i++){
+        existingContracts.value[i].fahrstrecke = (existingContracts.value[i].fahrstrecke / 1000).toFixed(2)
+      }
+    }
+
 
     return {
       addCustomer,
@@ -108,7 +135,9 @@ export default {
       loading, 
       showCustomer,
       modalActive,
-      closeModal
+      closeModal,
+      convertTimestamp,
+      convertDistance
 
     };
   },
