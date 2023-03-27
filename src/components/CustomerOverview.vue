@@ -9,11 +9,10 @@
             </div>
 </NoCustomerExist>
 
-<div class="row row-cols-1 row-cols-md-4 g-4 m-auto justify-content-center">
+<div class="row row-cols-1 row-cols-md-5 g-5 m-auto justify-content-center">
   <div class="col" v-for="existingContract in existingContracts" :key="existingContract.id" >
-    <div class="card h-100">
-      <img src="https://mdbcdn.b-cdn.net/img/new/standard/city/041.webp" class="card-img-top"
-        alt="Hollywood Sign on The Hill" />
+    <div class="card h-80">
+      <img :src="randomImage(images)" class="card-img-top" />
       <div class="card-body">
         <h5 class="card-title">{{existingContract.firstName}} {{existingContract.lastName}}</h5>
         <p class="card-text m-0 "><strong>ID:</strong> {{ existingContract.id }} </p>
@@ -55,12 +54,22 @@ export default {
 
   setup() {
 
-   
+    const images = ref(['https://cdn.pixabay.com/photo/2017/01/20/00/30/maldives-1993704__340.jpg','https://cdn.pixabay.com/photo/2017/12/15/13/51/polynesia-3021072__340.jpg', 
+                    'https://cdn.pixabay.com/photo/2016/03/04/19/36/beach-1236581__340.jpg', 'https://cdn.pixabay.com/photo/2020/04/17/20/25/road-5056788__340.jpg',
+                   'https://cdn.pixabay.com/photo/2015/03/02/23/40/father-656734__340.jpg', 'https://cdn.pixabay.com/photo/2017/01/08/19/30/rio-de-janeiro-1963744__340.jpg' ])
+
+    
+    function randomImage(images) {
+      const randomIndex = Math.floor(Math.random() * images.length);
+      return images[randomIndex];
+    }
     
     const router = useRouter();
     const existingContracts = ref()
     const loading = ref(false)
     const modalActive = ref(false)
+
+
     
 
     onMounted( async ()  => {
@@ -137,7 +146,9 @@ export default {
       modalActive,
       closeModal,
       convertTimestamp,
-      convertDistance
+      convertDistance,
+      images,
+      randomImage
 
     };
   },
@@ -208,6 +219,12 @@ export default {
   padding: 0;
   -webkit-box-sizing: inherit;
           box-sizing: inherit;
+}
+
+.card-img-top{
+  width: auto;
+  height: 200px;
+
 }
 
 </style>
