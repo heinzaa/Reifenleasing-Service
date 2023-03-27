@@ -1,17 +1,20 @@
 <template>
 
-<div class="heading mt-5">
-<p class="heading-text">Reiseinformationen</p>
+<div class="heading mb-2">
+<p class="heading-text"><strong>Reiseinformationen</strong></p>
 </div>
+
+<div class="MapContainer mt-2">
 <h3>Bitte wählen Sie die Reisreoute</h3>
 
 <Map ref="mapComponent" />
+</div>
 
 
 
-<div class="mb-2">
     <h4>Anzahl Kilometer (in Kilometer)</h4>
-    <form class="row" >    
+    <div class="mb-2 d-flex justify-content-center align-items-center">
+    <form class="row justify-content-center" >    
       <div class="col">
             <input type="number" id="anzahlKilometerInputId" class="form-control" name="anzahlKilometer" required disabled v-model="kilometers" /> 
             <div class="error mb-2">{{error}}</div>           
@@ -21,47 +24,31 @@
         </button>
       </div>
     </form>
-</div>
-<button type="button" class="btn btn-outline-info btn-rounded mb-2" :disabled="bWeiter" @click="enableTireSelection">Weiter</button>
+    </div>
 
 
-<div v-if="routeSelected">
-<h4>2. Bitte wählen Sie die Reifeklasse aus!</h4>
+
+<h4  v-if="routeSelected">Bitte wählen Sie die Reifeklasse aus!</h4>
+<div  v-if="routeSelected" class="mb-2 d-flex justify-content-center align-items-center"  style="margin: 20px; font-size: 30px;" >
 <form>
-         <div class="mb-3">          
-             <div class="city-item">
-           <select id="selectTireClassId" @change="onTireSelected" class="form-select" v-model="tiresClass" required>
-            <option selected value="" disabled>Reifenklasse</option>
-              <option value="Premiumklasse">Premiumklasse</option>
-              <option value="Oberklasse">Oberklasse</option>
-              <option value="Mittelklasse">Mittelklasse</option>
-            </select>
-             </div>
-          </div>    
+         <div class="row">  
+            <div class="col">       
+                <select id="selectTireClassId" @change="onTireSelected" class="form-select form-control" v-model="tiresClass" required>
+                    <option selected value="" disabled>Reifenklasse</option>
+                    <option value="Premiumklasse">Premiumklasse</option>
+                    <option value="Oberklasse">Oberklasse</option>
+                    <option value="Mittelklasse">Mittelklasse</option>
+                </select>
+            </div> 
+        </div>
+        <div class="col">
+            <button type="button" class="btn btn-outline-info btn-rounded mb-2 form-control" :disabled="tiresClassSelected" @click="uplaodData">Weiter</button>
+        </div>
 </form>
-<button type="button" class="btn btn-outline-info btn-rounded mb-2"  @click="uplaodData">Weiter</button>
+
 </div>
 
-
-
-
-<!-- <div class="mb-2">
-    <h4>Preis berechnen</h4>
-    <form class="row" >    
-      <div class="col">
-            <input type="number" id="preisInputId" class="form-control" name="gesamtPreis" required disabled v-model="gesamtPreis" />            
-      </div>
-      <div class="col">
-        <button class="btn btn-outline-info btn-rounded" type="button" @click="calculatePrice" :disabled="bKilometers"> <span>{{loading ? "Laden..." : "Preis berechnen"}}</span>
-        </button>
-      </div>
-    </form>
-</div> -->
-
-    
-  
-
-        
+      
        
         
       
@@ -96,6 +83,7 @@ export default {
         const gesamtPreis = ref()
         const bWeiter = ref(true)
         const error = ref()
+        const tiresClassSelected = ref(false)
 
         const enableTireSelection = () =>{
             if(kilometers.value != null){
@@ -111,6 +99,8 @@ export default {
             else{
             bWeiter.value = false
             error.value = ''
+            bKilometers.value = true
+            enableTireSelection()
         }
         }
 
@@ -128,6 +118,7 @@ export default {
             getTireInformation()
             
             loading.value = false
+            tiresClassSelected.value = true
         }
 
 
@@ -173,7 +164,8 @@ export default {
             bKilometers,
             gesamtPreis,
             bWeiter,
-            error
+            error,
+            tiresClassSelected
         }
     }
 
@@ -193,4 +185,14 @@ export default {
     color: red;
 }
 
+.MapContainer{
+
+}
+
+h3{
+    text-align: center;
+}
+h4{
+    text-align: center;
+}
 </style>
