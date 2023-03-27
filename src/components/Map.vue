@@ -30,8 +30,9 @@
       <l-popup :content="marker.tooltip" />
       <l-tooltip :content="marker.tooltip" />
     </l-marker>
+    <l-polyline :lat-lngs="polyline.latlngs" :color="polyline.color"></l-polyline>
   </l-map>
-  <button type="button" class="btn btn-info mt-1 mb-1"  @click="getaInstructions" :disabled="loading"> <span>{{loading ? "Laden..." : "Strecke laden"}}</span>
+  <button type="button" class="btn btn-info mt-2 mb-1 buttonLoadMap"  @click="getInstructions" :disabled="loading"> <span>{{loading ? "Laden..." : "Strecke laden"}}</span>
   </button>
 </div>
 
@@ -41,7 +42,7 @@
 <script>
 import "leaflet/dist/leaflet.css";
 import { latLng } from "leaflet";
-import { LMap, LTileLayer, LMarker, LPopup, LTooltip } from "@vue-leaflet/vue-leaflet";
+import { LMap, LTileLayer, LMarker, LPopup, LTooltip, LPolyline } from "@vue-leaflet/vue-leaflet";
 import { ref, onMounted } from 'vue';
 import axios from 'axios';
 import { supabase } from '../supabase'
@@ -53,7 +54,8 @@ components: {
   LTileLayer,
   LMarker,
   LPopup,
-  LTooltip
+  LTooltip,
+  LPolyline
 },
 
 setup(context){
@@ -71,6 +73,10 @@ setup(context){
   let  mapOptions = {
        zoomSnap: 0.5
     }
+  let polyline = ref({
+        latlngs: [],
+        color: 'red'
+      })
   let positionStartPoint = ''
   let  positionEndPoint = ''
   let  aInstructions = ref([])
@@ -78,10 +84,12 @@ setup(context){
   let  reiseID = ref(null)
   
   let aPoints = ref()
+  const oStartPointAdressInformation = ref()
+  const oEndPointAdressInformation = ref()
    
    
 
-   const getaInstructions = async () => {
+   const getInstructions = async () => {
 
       if(markers.value.length < 2){
         alert("Es müssen 2 Marker gesetzt werden.")
@@ -104,6 +112,58 @@ setup(context){
       aInstructions.value = response.data.paths[0].instructions;
       aPoints.value = response.data.paths[0].points.coordinates;
 
+
+      let aPolyline = []
+    /*  for (let i = 0; i < aPoints.value.length; i++){
+       
+       let oPoints = aPoints.value[i]
+       console.log(oPoints)
+       let helperarray = []
+       helperarray.push(oPoints['0'])
+       helperarray.push(oPoints['1'])
+        aPolyline.push(helperarray)
+
+      } */
+      // [[-27.96199, 153.3952],[-27.98199, 153.5952]]
+      const o = [{ 0: -27.96199, 
+                  1:153.3952
+                },
+                { 0: -27.98199, 
+                  1: 153.5952 }
+                 ]
+
+      console.log('o: ' + o)
+      console.log('points: ' + aPoints.value)
+
+      const arrayObject = []
+       arrayObject.push(aPoints.value)
+      
+
+      for(let i = 0; i < arrayObject.length; i++){
+        var array = arrayObject[i]
+        var helper = []
+        helper.push(array[0])
+        helper.push(array[1])
+
+        aPolyline.push(helper)
+
+      }
+      
+      polyline.value.latlngs = aPolyline
+      
+
+      
+
+    // hier werden die Startpunkt mit Namen geholt
+      const startpointData= await axios.get(`https://nominatim.openstreetmap.org/reverse?lat=${point1_lat}&lon=${point2_lng}&format=json`)
+      oStartPointAdressInformation.value = startpointData.data.address
+
+      // hier wird der Endpunkt geholt
+      const endpointData = await axios.get(`https://nominatim.openstreetmap.org/reverse?lat=${point3_lat}&lon=${point4_lng}&format=json`)
+      oEndPointAdressInformation.value = endpointData.data.address
+
+
+      // hier werden 
       
       // anhand der Intervalle die angegeben sind in dem InstrucitonsObjekt werden die daszugehörigen Punktarrays in das Instructionsobjekt geschrieben 
       mapPointsToInstructions(response)
@@ -121,7 +181,9 @@ setup(context){
               .insert({ fahrstrecke: Math.round(distance.value), 
                          startpunkt: `${markers.value[0].position.lat},${markers.value[0].position.lng}`,
                          endpunkt: `${markers.value[1].position.lat},${markers.value[1].position.lng}`,
-                         straßeninfos: aInstructions.value                         
+                         straßeninfos: aInstructions.value,   
+                         startpunkt_adress_infos: oStartPointAdressInformation.value,
+                         endpunkt_adress_infos: oEndPointAdressInformation.value                       
               }).select()
           if (data){
               reiseID.value = data[0].id              
@@ -212,7 +274,8 @@ setup(context){
 return{
     zoom, center, url, attribution, withPopup, withTooltip, currentZoom, currentCenter, showParagraph, markers, mapOptions,
     positionStartPoint, positionEndPoint, aInstructions, distance, travelInformationToDB, zoomUpdate, centerUpdate,
-    addMarker, getaInstructions, loading, reiseID, mapPointsToInstructions, aPoints, fetchOsmIdForEveryStreetPoint
+    addMarker, getInstructions, loading, reiseID, mapPointsToInstructions, aPoints, fetchOsmIdForEveryStreetPoint, 
+    oStartPointAdressInformation, oEndPointAdressInformation, polyline
 
   };
 },
@@ -220,11 +283,21 @@ return{
 </script>
 <style scoped>
 
-.map-parent{
-  height: 900px; 
-  width: 1200px;
+.map-parent{  
   text-align: center;
   padding: 2rem;
+  display: flex;
+  display: flex;
+    flex-wrap: nowrap;
+    flex-direction: column;
+    align-content: center;
+    justify-content: flex-end;
+    align-items: center;
+  
+}
+
+.buttonLoadMap{
+  
 }
 
 </style>
