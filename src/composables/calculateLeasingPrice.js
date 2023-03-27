@@ -2,13 +2,14 @@ import { ref, watchEffect } from 'vue'
 import { supabase } from '../supabase'
 import axios from 'axios';
 
-const calculateLeasingPrice = async () => {
+const calculateLeasingPrice = async (reiseID) => {
 
     const aInstrcutions = ref()
 
-    const { data, error } = await supabase
+    var { data, error } = await supabase
               .from('Reiseinformationen')
               .select()
+              .eq('id', reiseID)
               
           if (data){
 
@@ -159,9 +160,46 @@ const calculateLeasingPrice = async () => {
         // Jetzt kann der Durchschnittliche Roughnessfaktor berechnet werden für die Gesamtstrecke
         // dafür wird accountedIntervallDistanceAndRoughnessFaktor durch die Gesamtdistanz geteilt
 
-        const averageRoughnessForRoad = Math.round(accountedIntervallDistanceAndRoughnessFaktor / accountedDistance)
+        const averageRoughnessForRoad = accountedIntervallDistanceAndRoughnessFaktor / accountedDistance
 
         // jedes 
+        //averageroughnessfaktor kann nun mit dem Reifenpreis & der Kilometeranzahl verrechnet werden
+
+        let tireInformation;
+        // get tireinformation
+        var { data, error } = await supabase
+        .from('Rechnung')
+        .select(`
+          reifenID,
+          Reifen (
+            id,
+            basispreis
+           )
+        `)
+        if (error){
+            throw error;
+        }
+        if (data){
+          tireInformation = data[0]
+         }           
+       
+
+         // Reifenpreis holen
+         let tirePrice = tireInformation.Reifen.basispreis
+
+         // Annahme ein Reifen hält 40.000 km - Reifen Laufleisting
+         const tireMileage = 40000
+         
+
+         // ausrechnen was der reifen pro/km kostet (Kaufpreis / 40000)
+
+         let costPerKilometer = tirePrice / tireMileage
+
+         // accounted Distanz ist die Strecke in meter - muss noch in Km umgerechnet werden
+         let costForReturnedDistance = costPerKilometer * (accountedDistance/1000)
+
+         // Endpreis ->  gefahrener KilometerPreis * roughnessfaktor -> hier wird nur 10% berechnet sonst wird der reifen zu teuer
+         let leasingPrice = (costForReturnedDistance * (1 + averageRoughnessForRoad / 10) ).toFixed(2)
 
 
         console.log('Rougness: ' + averageRoughnessForRoad)
@@ -169,7 +207,7 @@ const calculateLeasingPrice = async () => {
 
 
 
-    return { leasingPrice }
+    return  { leasingPrice, averageRoughnessForRoad }
 }
 
 export default calculateLeasingPrice
