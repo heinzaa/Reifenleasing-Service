@@ -5,8 +5,6 @@
         <transition name="model-animation-inner">
           <div v-show="modalActive" class="modal-inner">
             <slot />
-            <button type="button" class="btn btn-outline-secondary mt-2 mr-2" @click="cancel">Schließen</button>
-            <button type="button" class="btn btn-info btn-rounded ml-2 mt-2"  @click="close">Rechnung anzeigen</button>
           </div>
         </transition>
       </div>
@@ -62,10 +60,6 @@
       text-align:center;
       border-radius: 10px;
       border: black;
-      display: flex;
-    flex-direction: column;
-    flex-wrap: nowrap;
-    align-content: stretch;
   }
   
   .model-animation-enter-active,
