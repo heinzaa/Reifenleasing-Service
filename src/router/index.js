@@ -6,6 +6,23 @@ const Registration = () => import('../views/Registration.vue')
 import AddCustomer from '../views/AddCustomer.vue'
 import ContractView from '../views/ContractView.vue'
 
+import { supabase } from '../supabase'
+
+const requireAuth = async (to, from, next) => {
+
+const { data: { session } } = await supabase.auth.getSession()
+   
+  if(!session?.user){
+    window.alert("Um auf die gewünschte Seite navigieren zu können, müssen Sie angemeldet sein und ihre Email verifiziert haben.")
+    next({ name: 'Login' })
+    return
+  }
+  else {
+    next()
+    return 
+  }
+}
+
 const routes = [
   {
     path: '/',
@@ -19,18 +36,21 @@ const routes = [
   },
   {
       path: '/Dashboard',
-      component: Dashboard
+      component: Dashboard,
+      beforeEnter: requireAuth
   },
   {
     path: '/addCustomer',
     name: 'AddCustomer',
-    component: AddCustomer
+    component: AddCustomer,
+    beforeEnter: requireAuth
   },
   {
     path: '/contract/:id',
     name: 'contract',
     component: ContractView,
-    props: true
+    props: true,
+    beforeEnter: requireAuth
   },
   {
     path: '/:callAll(.*)',
