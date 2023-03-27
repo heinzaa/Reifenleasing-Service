@@ -4,16 +4,17 @@
 <p class="heading-text">Reiseinformationen</p>
 </div>
 <h3>Bitte wählen Sie die Reisreoute</h3>
-<div>
+
 <Map ref="mapComponent" />
-</div>
 
 
-<div>
+
+<div class="mb-2">
     <h4>Anzahl Kilometer (in Kilometer)</h4>
     <form class="row" >    
       <div class="col">
-            <input type="number" id="anzahlKilometerInputId" class="form-control" name="anzahlKilometer" required disabled v-model="kilometers" />            
+            <input type="number" id="anzahlKilometerInputId" class="form-control" name="anzahlKilometer" required disabled v-model="kilometers" /> 
+            <div class="error mb-2">{{error}}</div>           
       </div>
       <div class="col">
         <button class="btn btn-outline-info btn-rounded" type="button" @click="showKilometers" :disabled="bKilometers"> <span>{{loading ? "Laden..." : "Distanz berechnen"}}</span>
@@ -21,14 +22,13 @@
       </div>
     </form>
 </div>
-<button type="button" class="btn btn-outline-info btn-rounded" @click="enableTireSelection">Weiter</button>
+<button type="button" class="btn btn-outline-info btn-rounded mb-2" :disabled="bWeiter" @click="enableTireSelection">Weiter</button>
 
 
 <div v-if="routeSelected">
 <h4>2. Bitte wählen Sie die Reifeklasse aus!</h4>
 <form>
          <div class="mb-3">          
-             <label for="selectTireClassId">Reifenklasse</label>
              <div class="city-item">
            <select id="selectTireClassId" @change="onTireSelected" class="form-select" v-model="tiresClass" required>
             <option selected value="" disabled>Reifenklasse</option>
@@ -39,29 +39,28 @@
              </div>
           </div>    
 </form>
+<button type="button" class="btn btn-outline-info btn-rounded mb-2"  @click="uplaodData">Weiter</button>
 </div>
 
 
 
-<div>
+
+<!-- <div class="mb-2">
     <h4>Preis berechnen</h4>
     <form class="row" >    
       <div class="col">
             <input type="number" id="preisInputId" class="form-control" name="gesamtPreis" required disabled v-model="gesamtPreis" />            
       </div>
       <div class="col">
-        <button class="btn btn-outline-info btn-rounded" type="button" @click="calculatePrice" :disabled="bKilometers"> <span>{{loading ? "Laden..." : "Distanz berechnen"}}</span>
+        <button class="btn btn-outline-info btn-rounded" type="button" @click="calculatePrice" :disabled="bKilometers"> <span>{{loading ? "Laden..." : "Preis berechnen"}}</span>
         </button>
       </div>
     </form>
-</div>
+</div> -->
 
     
   
-          <div v-if="tireSelected" class="btn-block">
-            <button class="btn btn-outline-info btn-rounded" type="button" @click="addInvoice" :disabled="loading"> <span>{{loading ? "Laden..." : "Infos hochladen"}}</span>
-            </button>
-          </div>
+
         
        
         
@@ -71,7 +70,7 @@
 <script>
 
 
-import { ref } from 'vue'
+import { onMounted, ref } from 'vue'
 import { supabase } from '../supabase'
 import Map from './Map.vue'
 
@@ -95,6 +94,8 @@ export default {
         const routeSelected = ref(false)
         const tireSelected = ref(false)
         const gesamtPreis = ref()
+        const bWeiter = ref(true)
+        const error = ref()
 
         const enableTireSelection = () =>{
             if(kilometers.value != null){
@@ -104,6 +105,13 @@ export default {
 
         const showKilometers = () => {
             kilometers.value = Math.round(mapComponent.value.distance / 1000)
+            if(kilometers.value == 0){
+                error.value = 'Bitte wählen Sie zuerst eine Route aus!'
+            }
+            else{
+            bWeiter.value = false
+            error.value = ''
+        }
         }
 
       
@@ -115,10 +123,10 @@ export default {
 
         }
 
-        const addInvoice = () => {
+        const uplaodData = () => {
             loading.value = true
             getTireInformation()
-            reiseID.value = mapComponent.value.reiseID
+            
             loading.value = false
         }
 
@@ -142,13 +150,9 @@ export default {
             }
         }
 
-
-        const calculatePrice = () => {
-
-
-            
-        }
-
+        onMounted( () => {
+            reiseID.value = mapComponent.value.reiseID
+        })
         
 
         return {
@@ -159,7 +163,7 @@ export default {
             getTireInformation,
             reifenID,
             price,
-            addInvoice,
+            uplaodData,
             tiresClass,
             enableTireSelection,
             routeSelected,
@@ -167,7 +171,9 @@ export default {
             tireSelected,
             showKilometers,
             bKilometers,
-            gesamtPreis
+            gesamtPreis,
+            bWeiter,
+            error
         }
     }
 
@@ -182,6 +188,9 @@ export default {
 .heading-text{
     font-size: 3rem;
     font: bold;
+}
+.error{
+    color: red;
 }
 
 </style>
