@@ -14,6 +14,8 @@
     @update:center="centerUpdate"
     @update:zoom="zoomUpdate"
     @click="addMarker"
+    ref="map"
+    @ready="mapisReady"
   >
     <l-tile-layer
       :url="url"
@@ -24,13 +26,14 @@
       :key="marker.name"
       :visible="marker.visible"
       :draggable="marker.draggable"
-      :lat-lng="marker.position"
+      :latLng="marker.position"
       :icon="marker.icon"
     >
+    
       <l-popup :content="marker.tooltip" />
       <l-tooltip :content="marker.tooltip" />
     </l-marker>
-    <l-polyline :lat-lngs="polyline.latlngs" :color="polyline.color"></l-polyline>
+    <l-polyline ref="polylineRef" :latLngs="polyline.latlngs" @ready="polylineReady" @update:visible="isVisible" :visible="bPolyline" :color="polyline.color"></l-polyline>
   </l-map>
   <button type="button" class="btn btn-info mt-2 mb-1 buttonLoadMap"  @click="getInstructions" :disabled="loading"> <span>{{loading ? "Laden..." : "Strecke laden"}}</span>
   </button>
@@ -42,10 +45,11 @@
 <script>
 import "leaflet/dist/leaflet.css";
 import { latLng } from "leaflet";
-import { LMap, LTileLayer, LMarker, LPopup, LTooltip, LPolyline } from "@vue-leaflet/vue-leaflet";
+import { LMap, LTileLayer, LMarker, LPopup, LTooltip, LPolyline, LGeoJson } from "@vue-leaflet/vue-leaflet";
 import { ref, onMounted } from 'vue';
 import axios from 'axios';
 import { supabase } from '../supabase'
+import L from 'leaflet'
 
 export default {
 name: "Example",
@@ -57,6 +61,22 @@ components: {
   LTooltip,
   LPolyline
 },
+
+data: () => ({
+  map: null
+}),
+methods: {
+
+    mapisReady() {
+
+      console.log('Marc')
+      this.map = this.$refs.map.mapObject
+      console.log('Map: ' + this.map)
+
+    }
+
+},
+
 
 setup(context){
   const loading = ref(false)
@@ -82,11 +102,13 @@ setup(context){
   let  aInstructions = ref([])
   let  distance = ref('')
   let  reiseID = ref(null)
-  
+      
+  let bPolyline = ref(false)
+
   let aPoints = ref()
   const oStartPointAdressInformation = ref()
   const oEndPointAdressInformation = ref()
-   
+
    
 
    const getInstructions = async () => {
@@ -131,25 +153,35 @@ setup(context){
                 { 0: -27.98199, 
                   1: 153.5952 }
                  ]
+          polyline.value.latlngs.push([-27.96199, 153.3952], [-27.98199, 153.5952])
+          //polyline.value.latlngs.push([-27.98199, 153.5952])
+
 
       console.log('o: ' + o)
       console.log('points: ' + aPoints.value)
 
       const arrayObject = []
-       arrayObject.push(aPoints.value)
+       //arrayObject.push(aPoints.value)
       
+       let o2 = {}
+       for(let i = 0; i < aPoints.value.length; i++){
+        //for(let i = 0; i < 2; i++){
 
-      for(let i = 0; i < arrayObject.length; i++){
-        var array = arrayObject[i]
-        var helper = []
-        helper.push(array[0])
-        helper.push(array[1])
+        let arrayPro = []
 
-        aPolyline.push(helper)
+        o2['0'] = aPoints.value[i]['1'].toFixed(4)
+        o2['1'] = aPoints.value[i]['0'].toFixed(5)
 
-      }
+        
+        
+
+        arrayObject.push(o2)
+
+        o2 = {}
+
+       }
       
-      polyline.value.latlngs = aPolyline
+     // polyline.value.latlngs = o
       
 
       
@@ -171,7 +203,17 @@ setup(context){
   
        await travelInformationToDB();
 
+       
+       
+       bPolyline = true
        loading.value = false 
+  }
+  
+
+  const polylineReady = () => {
+
+    console.log('polyline: ' + polyline.value)
+
   }
   
 
@@ -249,6 +291,12 @@ setup(context){
 
   }
 
+  const isVisible = () => {
+
+    console.log('visible: ' + bPolyline.value)
+
+  }
+
   const fetchOsmIdForEveryStreetPoint = async () => {
 
 
@@ -266,16 +314,14 @@ setup(context){
 
     }
 
-  };
-
-
+  }
 
 
 return{
     zoom, center, url, attribution, withPopup, withTooltip, currentZoom, currentCenter, showParagraph, markers, mapOptions,
     positionStartPoint, positionEndPoint, aInstructions, distance, travelInformationToDB, zoomUpdate, centerUpdate,
     addMarker, getInstructions, loading, reiseID, mapPointsToInstructions, aPoints, fetchOsmIdForEveryStreetPoint, 
-    oStartPointAdressInformation, oEndPointAdressInformation, polyline
+    oStartPointAdressInformation, oEndPointAdressInformation, polyline, polylineReady, bPolyline, isVisible
 
   };
 },
