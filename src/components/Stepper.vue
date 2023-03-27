@@ -25,6 +25,14 @@
             </div>
         </NoCustomerExist>
 
+        
+
+        <InvoiceCreatedModal :modal-active="modalActiveSubmit" @close="navToInvoice" @cancel="closeModalSubmit">
+            <div>
+                <b-icon-send-check style="font-size:3em; margin:15px; color:green;"></b-icon-send-check> 
+                <h2>Rechnung erfolgreich erstellt!</h2>          
+            </div>
+        </InvoiceCreatedModal>
 
     </Wizard>
 
@@ -37,20 +45,24 @@ import 'form-wizard-vue3/dist/form-wizard-vue3.css'
 import Wizard from 'form-wizard-vue3'
 import { ref, onMounted } from 'vue'
 import { supabase } from '../supabase'
+import { useRouter } from 'vue-router'
 
 import ContactDetails from './ContactDetails.vue'
 import TravelInformation from './TravelInformation.vue'
 import NoCustomerExist from './Modals/NoCustomerExist.vue'
+import calculateLeasingPrice from '../composables/calculateLeasingPrice'
+import InvoiceCreatedModal from './Modals/InvoiceCreatedModal.vue'
 
 export default {
     components:{
-        Wizard, ContactDetails, TravelInformation, NoCustomerExist
+        Wizard, ContactDetails, TravelInformation, NoCustomerExist,
+        InvoiceCreatedModal
     },
 
     setup(){
 
       const currentTabIndex = ref(null)
-
+      const router = useRouter()
     
 
       const TravelInformationRef = ref(null)
@@ -58,8 +70,12 @@ export default {
       const kundenID = ref(null)
       const reifenID = ref(null)
       const reiseID = ref(null)
+      const accountedleasingprice = ref()
+      const roughnessForRoad = ref()
+      const rechnungID = ref()
 
       const modalActive = ref(false)
+      const modalActiveSubmit = ref(false)
       
 
 
@@ -76,12 +92,15 @@ export default {
                    .from('Rechnung')
                    .insert({ kundenID: kundenID.value,
                              reifenID: TravelInformationRef.value.reifenID,
-                             reiseID: TravelInformationRef.value.mapComponent.reiseID,                    
+                             reiseID: TravelInformationRef.value.mapComponent.reiseID, 
+                             preis: accountedleasingprice.value       ,
+                             iri: roughnessForRoad.value            
                    }).select()
                if (error){
                    throw error
                } 
                if (data){
+                rechnungID.value = data[0].id
                    return data
                }
                } catch(error){
@@ -102,16 +121,50 @@ export default {
       }
       console.log('All Tabs');
     }
-    const wizardCompleted = () => {
+    const wizardCompleted = async () => {
       if(TravelInformationRef.value.reifenID == null){
         modalActive.value = true
         return
       }
+      const { leasingPrice, averageRoughnessForRoad }  = await calculateLeasingPrice(TravelInformationRef.value.mapComponent.reiseID)
+      accountedleasingprice.value = leasingPrice
+      roughnessForRoad.value = averageRoughnessForRoad
       console.log('Wizard Completed');
-      createInvoice()
+      createInvoice( )
+      modalActiveSubmit.value = true
 
     }
+
+    const getTireInformation = async () => {
+            try{
+            console.log("reifenklasse" + TravelInformationRef.value.tiresClass)
+            const { data, error } = await supabase
+                .from('Reifen')
+                .select()
+                .eq('reifenklasse', TravelInformationRef.value.tiresClass)
+            if (error){
+                throw error;
+            }
+            if (data){
+                reifenID.value = data[0].id
+                return data
+            }           
+            } catch (error){
+                alert(error.message)
+            }
+        }
     
+        const navToInvoice = () => {
+
+          router.push({ name: "contract", params: { id:  rechnungID.value } });
+
+        }
+
+    
+    const closeModalSubmit = () =>{
+      modalActiveSubmit.value = false
+    }
+
     const closeModal = () =>{
       modalActive.value = false
     }
@@ -129,7 +182,14 @@ export default {
           reifenID,
           reiseID,
           modalActive,
-          closeModal
+          closeModal,
+          accountedleasingprice,
+          getTireInformation,
+          roughnessForRoad,
+          modalActiveSubmit,
+          navToInvoice,
+          closeModalSubmit,
+          rechnungID
           
         }
 
