@@ -1,4 +1,5 @@
 <template>
+  <TemplateHeader />
   <div>
   <Stepper />
 </div>
@@ -6,10 +7,11 @@
 
 <script>
 import Stepper from '../components/Stepper.vue';
+import TemplateHeader from '../components/TemplateHeader.vue';
 
 export default {
     components: {
-        Stepper
+        Stepper, TemplateHeader
     }
 
 }

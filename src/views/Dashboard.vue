@@ -1,31 +1,33 @@
 <template>
+
+    <TemplateHeader />
+
 <div class="heading mt-5">
 <p class="heading-text">Kundenübersicht</p>
 </div>
         <CustomerOverview />
-        <button @click="calculate">Calculate</button>
+    
 </template>
 
 <script>
 import CustomerOverview from '../components/CustomerOverview.vue'
-import calculateLeasingPrice from '../composables/calculateLeasingPrice';
+import TemplateHeader from '../components/TemplateHeader.vue'
+
 import { ref } from 'vue'
 
 export default {
     components:{
-        CustomerOverview
+        CustomerOverview, TemplateHeader
     },
 
     setup(){
 
-    const calculate = ref()
+   
     
-    const { price } = calculateLeasingPrice() 
 
     return {
 
-        calculate
-
+    
     }
 
     }

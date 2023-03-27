@@ -1,8 +1,11 @@
 <template>
- <div class="container">
-
-<div class="page-header">
+    <TemplateHeader />
+ 
+    
+<div class="mt-5 d-flex flex-lg-row justify-content-center">
+   
     <h1>Kundenübersicht</h1>
+
 </div>
 
 
@@ -22,106 +25,102 @@
                     </div>
                 </div>
                 <br />
-                <div class="row">
+                <div class="row mb-2">
                     <div class="col-md-12 text-center">
-                        <h2>Rechnung</h2>
-                        <h5>{{ oInvoiceInformation[0].id }}</h5>
+                        <h2><u>Rechnung</u></h2>
+                        <h6>{{ oInvoiceInformation[0].id }}</h6>
                     </div>
                 </div>
-                <div class="column">
-                    <h5>Reiseinformationen</h5>
-                    <p>{{ oInvoiceInformation[0].fahrstrecke }} Km</p>
-                    <p>{{ oInvoiceInformation[0].reifenklasse }} - {{ oInvoiceInformation[0].reifenname }} - {{ oInvoiceInformation[0].hersteller }}</p>
+                <div>
+                    <h2 class="mb-3"><u>Reiseinformationen</u></h2>
+                    <p><strong>Zurückgelegte Streck: </strong>{{ oInvoiceInformation[0].fahrstrecke }} Km</p>
+                    <p><strong>Roughness Indicator:</strong>  {{ oInvoiceInformation[0].iri }}</p>
+                    <p><strong>Reifenklasse: </strong>{{ oInvoiceInformation[0].reifenklasse }}</p>
+                    <p><strong>Reifenname: </strong> {{ oInvoiceInformation[0].reifenname }}</p>
+                    <p><strong>Hersteller: </strong>{{ oInvoiceInformation[0].hersteller }}</p>
+                    <p><strong>Basispreis</strong> {{ oInvoiceInformation[0].basispreis }}</p>
+                    <p><strong>Von</strong> {{oInvoiceInformation[0].startpunkt_adress_infos.city}} - {{oInvoiceInformation[0].startpunkt_adress_infos.road}}</p>
+                    <p><strong>Nach</strong> {{oInvoiceInformation[0].endpunkt_adress_infos.city}} - {{oInvoiceInformation[0].endpunkt_adress_infos.road}}</p>
                 </div>
                 <br />
                 <div>
                     <table class="table">
                         <thead>
                             <tr>
-                                <th><h5>Description</h5></th>
-                                <th><h5>Amount</h5></th>
+                                <th><h5>Beschreibung</h5></th>
+                                <th><h5>Preis</h5></th>
                             </tr>
                         </thead>
                         <tbody>
                             <tr>
-                                <td class="col-md-9">Samsung Galaxy 8 64 GB</td>
-                                <td class="col-md-3"><i class="fas fa-rupee-sign" area-hidden="true"></i> 50,000 </td>
+                                <td class="col-md-9">Servicegebühren</td>
+                                <td class="col-md-3"><i class="fas fa-rupee-sign" area-hidden="true"></i> {{servicePrice}} €</td>
                             </tr>
                             <tr>
-                                <td class="col-md-9">JBL Bluetooth Speaker</td>
-                                <td class="col-md-3"><i class="fas fa-rupee-sign" area-hidden="true"></i> 5,200 </td>
+                                <td class="col-md-9">Leasingpreis</td>
+                                <td class="col-md-3"><i class="fas fa-rupee-sign" area-hidden="true"></i> {{ oInvoiceInformation[0].preis }} € </td>
                             </tr>
                             <tr>
-                                <td class="col-md-9">Apple Iphone 6s 16GB</td>
-                                <td class="col-md-3"><i class="fas fa-rupee-sign" area-hidden="true"></i> 25,000 </td>
+                                <td class="col-md-9">Rabatt</td>
+                                <td class="col-md-3"><i class="fas fa-rupee-sign" area-hidden="true"></i> {{ discountPrice }} € </td>
                             </tr>
-                            <tr>
-                                <td class="col-md-9">MI Smartwatch 2</td>
-                                <td class="col-md-3"><i class="fas fa-rupee-sign" area-hidden="true"></i> 2,200 </td>
-                            </tr>
-                            <tr>
-                                <td class="text-right">
-                                <p>
-                                    <strong>Shipment and Taxes:</strong>
-                                </p>
-                                <p>
-                                    <strong>Total Amount: </strong>
-                                </p>
-							    <p>
-                                    <strong>Discount: </strong>
-                                </p>
-							    <p>
-                                    <strong>Payable Amount: </strong>
-                                </p>
-							    </td>
-                                <td>
-                                <p>
-                                    <strong><i class="fas fa-rupee-sign" area-hidden="true"></i> 500 </strong>
-                                </p>
-                                <p>
-                                    <strong><i class="fas fa-rupee-sign" area-hidden="true"></i> 82,900</strong>
-                                </p>
-							    <p>
-                                    <strong><i class="fas fa-rupee-sign" area-hidden="true"></i> 3,000 </strong>
-                                </p>
-							    <p>
-                                    <strong><i class="fas fa-rupee-sign" area-hidden="true"></i> 79,900</strong>
-                                </p>
-							    </td>
+                            <tr>                              
                             </tr>
                             <tr style="color: #F81D2D;">
-                                <td class="text-right"><h4><strong>Total:</strong></h4></td>
-                                <td class="text-left"><h4><strong><i class="fas fa-rupee-sign" area-hidden="true"></i> 79,900 </strong></h4></td>
+                                <td class="text-right"><h4><strong>Gesamtpreis:</strong></h4></td>
+                                <td class="text-left"><h4><strong><i class="fas fa-rupee-sign" area-hidden="true"></i> {{ payableAmount }} € </strong></h4></td>
                             </tr>
                         </tbody>
                     </table>
                 </div>
                 <div>
                     <div class="col-md-12">
-                        <p><b>Date :</b> 6 June 2019</p>
+                        <p><b>Datum:</b> {{convertDate}}</p>
                         <br />
-                        <p><b>Signature</b></p>
+                        <p><b>Unterschrift</b></p>
                     </div>
                 </div>
             </div>
         </div>
     </div>
 </div>
-</div>
+
 
 </template>
 
 <script>
 import { ref, onMounted, onBeforeMount } from 'vue'
 import { supabase } from '../supabase'
+import { useRouter } from 'vue-router';
+import TemplateHeader from '../components/TemplateHeader.vue';
+import exp from 'constants';
 
 export default {
     props: ["id"],
+    components:{
+         TemplateHeader
+    },
 
     setup(props){
 
-        const oInvoiceInformation = ref(null)
+    
+
+        const router = useRouter()
+
+        const oInvoiceInformation = ref('')
         const loading = ref(false)
+        // Konstanter Servicezuschlag
+        const servicePrice = ref(10.00)
+        // 5% ist der Standard Rabatt
+        const discount = ref(0.05)
+        const discountPrice = ref()
+        const payableAmount = ref()
+        
+        const convertDate = ref()
+
+        const toDashboard = () => {
+            router.push('/Dashboard')
+        }
 
         const fetchInvoiceInformation = async () => {
             loading.value = true
@@ -149,6 +148,12 @@ export default {
 
           await fetchInvoiceInformation();
 
+          discountPrice.value = (oInvoiceInformation.value[0].preis *  discount.value).toFixed(2) 
+          payableAmount.value = oInvoiceInformation.value[0].preis - discountPrice.value + servicePrice.value
+          
+          let date = new Date(oInvoiceInformation.value[0].created_at)
+          convertDate.value = date.toLocaleDateString()
+          
         })
 
 
@@ -157,7 +162,14 @@ export default {
         return {
             fetchInvoiceInformation,
             loading,
-            oInvoiceInformation
+            oInvoiceInformation,
+            servicePrice,
+            discount,
+            discountPrice,
+            payableAmount,
+            convertDate,
+            toDashboard
+
         }
 
     }
@@ -168,11 +180,11 @@ export default {
 <style scoped>
 .body-main {
         background: #ffffff;
-        border-bottom: 15px solid #1E1F23;
-        border-top: 15px solid #1E1F23;
-        margin-top: 30px;
-        margin-bottom: 30px;
-        padding: 40px 30px !important;
+        border-bottom: 10px solid #1E1F23;
+        border-top: 10px solid #1E1F23;
+        margin-top: 10px;
+        margin-bottom: 10px;
+        padding: 10px 10px !important;
         position: relative ;
         box-shadow: 0 1px 21px #808080;
         font-size:10px;
@@ -192,7 +204,31 @@ export default {
         justify-content: center;
     }
 
+    p{
+        line-height: 50%;
+    }
+    a {
+  text-decoration: none;
+  display: inline-block;
+  padding: 8px 16px;
+}
 
+a:hover {
+  background-color: #ddd;
+  color: black;
+}
+
+.previous {
+  background-color: #f1f1f1;
+  color: black;
+}
+
+p {
+    font-size: 1rem;
+}
+td{
+    font-size:  0.9rem;
+}
 
 
 </style>
