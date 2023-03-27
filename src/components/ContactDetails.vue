@@ -1,28 +1,28 @@
 <template>
  
-    <div id="InvoiceForm">   
+    <div id="InvoiceForm" class="d-flex justify-content-center">   
     <div class="testbox">
       <form @submit.prevent="handleSubmit">
         <div class="banner">
           <h1>Kundeninformationen</h1>
         </div>
         <div class="item">
-          <p>Kundendaten</p>
+          <p class="label">Kundendaten</p>
           <div class="name-item">
-            <input type="text" name="name" placeholder="Vorname" v-model="firstName" />
+            <input type="text" name="name" placeholder="Vorname" v-model="firstName" re/>
             <input type="text" name="name" placeholder="Nachname" v-model="lastName" />
           </div>
         </div>
         <div class="item">
-          <p>Email</p>
+          <p class="label">Email</p>
           <input type="email" name="email" placeholder="E-Mail" v-model="eMail"/>
         </div>
         <div class="item">
-          <p>Telefonnummer</p>
+          <p class="label">Telefonnummer</p>
           <input type="text" name="phone" placeholder="### ### ####" v-model="phoneNumber"/>
         </div>
         <div class="item">
-          <p>Addresse</p>
+          <p class="label">Addresse</p>
           <input class="input-street" type="text" name="name" placeholder="Straße" v-model="street" required/>
           <div class="city-item">
             <input type="text" name="name" placeholder="Stadt" required v-model="city"/>
@@ -39,8 +39,8 @@
             </select>
           </div>
         </div>       
-        <div class="u-center-text u-margin-top-huge mt-2">
-            <button class="btn btn--green" type="button" @click="addInvoice" :disabled="loading || allreadySubmitted"> <span>{{loading ? "Laden..." : "Einreichen"}}</span>
+        <div class="u-center-text u-margin-top-huge mt-3">
+            <button class="btn btn-dark loading" type="submit" @click="addInvoice" :disabled="loading || allreadySubmitted"> <span>{{loading ? "Laden..." : "Einreichen"}}</span>
             </button>
           </div>
       </form>
@@ -49,7 +49,7 @@
             <div>
                 <b-icon-send-check style="font-size:3em; margin:15px; color:green;"></b-icon-send-check> 
                 <h2>Kundeninformationen erfolgreich hochgeladen.</h2>
-                <p>Bitte fahren Sie mit den Reiseninformationen fort!</p>
+                <p>Bitte fahren Sie über 'Next' mit den Reiseninformationen fort!</p>
             </div>
         </SubmitModal>
 
@@ -170,20 +170,17 @@ export default {
 }
 </script>
 <style scoped>
-      html, body {
-      min-height: 100%;
-      }
-      p{
+     
+      .label{
           color: white;
+          font-size: 1.2rem;
       }
       body, div, form, input, select, textarea{ 
       padding: 0;
       margin: 0;
-      outline: none;
       font-family: Roboto, Arial, sans-serif;
-      font-size: 14px;
-      color: black;
-      line-height: 22px;
+      font-size: 1.2rem;
+      line-height: 28px;
       margin-bottom: 0.5rem;
       }
       h1 {
@@ -194,18 +191,13 @@ export default {
       color: #fff;
       z-index: 2;
       }
-      .testbox {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: inherit;
-      padding: 20px;
-      }
+    
       form {
       width: 100%;
       padding: 20px;
       border-radius: 6px;
-      background: #27333A; 
+      background: #00aac8;
+      
       }
       .u-center-text{
         display: flex !important;
@@ -214,7 +206,7 @@ export default {
       .banner {
       position: relative;
       height: 300px;
-      background-image: url("../assets/roadtrip.jpeg");  
+      background-image: url("https://cdn.pixabay.com/photo/2014/08/15/11/29/beach-418742__340.jpg");  
       background-size: cover;
       background-attachment: scroll;
       display: flex;
@@ -223,7 +215,6 @@ export default {
       text-align: center;
       }
       .banner::after {
-      content: "";
       background-color: rgba(0, 0, 0, 0.4); 
       position: absolute;
       width: 100%;
@@ -340,6 +331,9 @@ export default {
       input{
           color: black;
       }
+    }
+    .loading{
+      border: 2px solid black;
 
-      }
+    }
 </style>
