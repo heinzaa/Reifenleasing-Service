@@ -8,7 +8,7 @@
           {
             title: 'Reiseinformationen',
           }]"
-          :beforeChange="onTabBeforeChange"
+        :beforeChange="onTabBeforeChange"
         @change="onChangeCurrentTab"
         @complete:wizard="wizardCompleted"
     >   
@@ -36,6 +36,12 @@
 
     </Wizard>
 
+    <LoadingModal :modal-active="modalLoadingActive" @cancel="closeModalLoading">
+            <div>
+                <b-icon-cloud-upload style="font-size:3em; margin:15px; color:green;"></b-icon-cloud-upload> 
+                <h2>Die Daten werden verarbeitet und eine Rechnung wird erstellt!</h2>          
+            </div>
+    </LoadingModal>
 
 
 </template>
@@ -52,12 +58,17 @@ import TravelInformation from './TravelInformation.vue'
 import NoCustomerExist from './Modals/NoCustomerExist.vue'
 import calculateLeasingPrice from '../composables/calculateLeasingPrice'
 import InvoiceCreatedModal from './Modals/InvoiceCreatedModal.vue'
+import LoadingModal from './Modals/LoadingModal.vue'
 
 export default {
     components:{
-        Wizard, ContactDetails, TravelInformation, NoCustomerExist,
-        InvoiceCreatedModal
-    },
+    Wizard,
+    ContactDetails,
+    TravelInformation,
+    NoCustomerExist,
+    InvoiceCreatedModal,
+    LoadingModal,
+},
 
     setup(){
 
@@ -76,6 +87,7 @@ export default {
 
       const modalActive = ref(false)
       const modalActiveSubmit = ref(false)
+      const modalLoadingActive = ref(false)
       
 
 
@@ -110,10 +122,12 @@ export default {
 
       const onChangeCurrentTab = (index, oldIndex) => {
       console.log(index, oldIndex);
-      currentTabIndex.value = index;
-      if(ContactDetails.value != null){
+    
+
+      if(ContactDetails.value != null ){
         kundenID.value = ContactDetails.value.kundenID
       }
+      currentTabIndex.value = index;
     }
     const onTabBeforeChange = () => {
       if (currentTabIndex.value === 0) {
@@ -121,16 +135,21 @@ export default {
       }
       console.log('All Tabs');
     }
+
+
     const wizardCompleted = async () => {
       if(TravelInformationRef.value.reifenID == null){
         modalActive.value = true
         return
       }
+      modalLoadingActive.value = true;
+
       const { leasingPrice, averageRoughnessForRoad }  = await calculateLeasingPrice(TravelInformationRef.value.mapComponent.reiseID)
       accountedleasingprice.value = leasingPrice
       roughnessForRoad.value = averageRoughnessForRoad
       console.log('Wizard Completed');
-      createInvoice( )
+      await createInvoice( )
+      modalLoadingActive.value = false
       modalActiveSubmit.value = true
 
     }
@@ -168,8 +187,6 @@ export default {
     const closeModal = () =>{
       modalActive.value = false
     }
-
-
         return {
           currentTabIndex,
           onChangeCurrentTab,
@@ -189,8 +206,8 @@ export default {
           modalActiveSubmit,
           navToInvoice,
           closeModalSubmit,
-          rechnungID
-          
+          rechnungID,
+          modalLoadingActive
         }
 
     }

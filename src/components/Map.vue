@@ -35,7 +35,7 @@
     </l-marker>
     <l-polyline ref="polylineRef" :latLngs="polyline.latlngs" @ready="polylineReady" @update:visible="isVisible" :visible="bPolyline" :color="polyline.color"></l-polyline>
   </l-map>
-  <button type="button" class="btn btn-info mt-2 mb-1 buttonLoadMap"  @click="getInstructions" :disabled="loading"> <span>{{loading ? "Laden..." : "Strecke laden"}}</span>
+  <button type="button" class="btn btn-info btn-lg mt-2 mb-1 buttonLoadMap"  @click="getInstructions" :disabled="bInstructionsLoaded"> <span>{{loading ? "Laden..." : "Strecke laden"}}</span>
   </button>
 </div>
 
@@ -94,7 +94,7 @@ setup(context){
        zoomSnap: 0.5
     }
   let polyline = ref({
-        latlngs: [],
+        latlngs: [[-27.96199, 153.3952],[-27.98199, 153.5952]],
         color: 'red'
       })
   let positionStartPoint = ''
@@ -109,9 +109,11 @@ setup(context){
   const oStartPointAdressInformation = ref()
   const oEndPointAdressInformation = ref()
 
-   
+  const bInstructionsLoaded = ref(false)
 
    const getInstructions = async () => {
+
+     
 
       if(markers.value.length < 2){
         alert("Es müssen 2 Marker gesetzt werden.")
@@ -135,54 +137,7 @@ setup(context){
       aPoints.value = response.data.paths[0].points.coordinates;
 
 
-      let aPolyline = []
-    /*  for (let i = 0; i < aPoints.value.length; i++){
-       
-       let oPoints = aPoints.value[i]
-       console.log(oPoints)
-       let helperarray = []
-       helperarray.push(oPoints['0'])
-       helperarray.push(oPoints['1'])
-        aPolyline.push(helperarray)
-
-      } */
-      // [[-27.96199, 153.3952],[-27.98199, 153.5952]]
-      const o = [{ 0: -27.96199, 
-                  1:153.3952
-                },
-                { 0: -27.98199, 
-                  1: 153.5952 }
-                 ]
-          polyline.value.latlngs.push([-27.96199, 153.3952], [-27.98199, 153.5952])
-          //polyline.value.latlngs.push([-27.98199, 153.5952])
-
-
-      console.log('o: ' + o)
-      console.log('points: ' + aPoints.value)
-
-      const arrayObject = []
-       //arrayObject.push(aPoints.value)
-      
-       let o2 = {}
-       for(let i = 0; i < aPoints.value.length; i++){
-        //for(let i = 0; i < 2; i++){
-
-        let arrayPro = []
-
-        o2['0'] = aPoints.value[i]['1'].toFixed(4)
-        o2['1'] = aPoints.value[i]['0'].toFixed(5)
-
-        
-        
-
-        arrayObject.push(o2)
-
-        o2 = {}
-
-       }
-      
-     // polyline.value.latlngs = o
-      
+  
 
       
 
@@ -195,18 +150,19 @@ setup(context){
       oEndPointAdressInformation.value = endpointData.data.address
 
 
-      // hier werden 
+      
       
       // anhand der Intervalle die angegeben sind in dem InstrucitonsObjekt werden die daszugehörigen Punktarrays in das Instructionsobjekt geschrieben 
       mapPointsToInstructions(response)
 
-  
+       
        await travelInformationToDB();
 
        
        
        bPolyline = true
        loading.value = false 
+       bInstructionsLoaded.value = true
   }
   
 
@@ -245,7 +201,7 @@ setup(context){
   const addMarker = (e) => {
       
   //sicherstellen das nicht mehr als 2 Marker gesetzt werden können
-    if(markers.value.length == 3){
+    if(markers.value.length == 2){
         alert("Es können nur 2 Marker gesetzt werden.")
         return;
     } 
@@ -321,7 +277,7 @@ return{
     zoom, center, url, attribution, withPopup, withTooltip, currentZoom, currentCenter, showParagraph, markers, mapOptions,
     positionStartPoint, positionEndPoint, aInstructions, distance, travelInformationToDB, zoomUpdate, centerUpdate,
     addMarker, getInstructions, loading, reiseID, mapPointsToInstructions, aPoints, fetchOsmIdForEveryStreetPoint, 
-    oStartPointAdressInformation, oEndPointAdressInformation, polyline, polylineReady, bPolyline, isVisible
+    oStartPointAdressInformation, oEndPointAdressInformation, polyline, polylineReady, bPolyline, isVisible, bInstructionsLoaded
 
   };
 },
@@ -343,7 +299,7 @@ return{
 }
 
 .buttonLoadMap{
-  
+  color: white;
 }
 
 </style>
