@@ -26,6 +26,7 @@
 <script>
 
 import { useRouter } from 'vue-router';
+import { supabase } from '../supabase';
 
 export default {
 
@@ -44,6 +45,9 @@ export default {
         }
 
         const logout = () => {
+
+
+           // const { error } = await supabase.auth.signOut()
             router.push('/Login')
         }
 
